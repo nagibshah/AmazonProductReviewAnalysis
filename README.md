@@ -14,6 +14,10 @@ https://s3.amazonaws.com/amazon-reviews-pds/tsv/index.txt
 
 ## Getting started with Local Dev + Development Rules
 1. Start work in your local branch (if more present create your own branch)
+    a. run from terminal "git branch" - should list down branches 
+    b. run command "git checkout <branchname>" to switch to new branch 
+    c. carry out your dev work in this remote branch and checkin as per usual 
+    d. once ready to merge simply submit a pull request (point 7)
 2. locate the appropriate notebook in the "/notebooks" folder
 3. Start the notebook and start working. 
 4. Lets work in separate notebooks due to git sync issues (see notebooks folder)
