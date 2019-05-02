@@ -34,6 +34,8 @@ https://s3.amazonaws.com/amazon-reviews-pds/tsv/index.txt
 5. Meaningful variable names and function names 
 6. write out dependencies/library versions
 7. rebase everyday (at least once a day)
+    1. type command in terminal - "git fetch origin"
+    2. now rebase from master - "git rebase origin/master" 
 
 ## Running in EMR
 
