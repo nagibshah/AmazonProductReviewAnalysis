@@ -1,0 +1,9 @@
+.DS_Store
+data/*
+.vscode/*
+notebooks/.ipynb_checkpoints/*
+notebooks/__pycache__/*
+# exception to the rule
+!data/.gitkeep 
+!output/.gitkeep 
+!scripts/.gitkeep 
