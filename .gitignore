@@ -7,3 +7,4 @@ notebooks/__pycache__/*
 !data/.gitkeep 
 !output/.gitkeep 
 !scripts/.gitkeep 
+!data/sample_us.tsv
