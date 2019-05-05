@@ -36,3 +36,11 @@ def FilterSentences(review_text):
     if len(sent_tokenize(review_text)) > 2: 
         return True
     return False
+
+@F.udf(returnType=BooleanType())
+def CountSents(review_text): 
+    '''
+    count the number of sentences in each review
+    '''
+    # sent tokenize and return number of sents (count)
+    len(sent_tokenize(review_text))
