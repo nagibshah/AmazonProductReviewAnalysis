@@ -27,6 +27,23 @@ def distributionStats(dfRecords, partitionBy, countBy, returnCountName="total_re
     except Exception:
         return None
 
+def getTopBySentNumber(dfRecords, topnCol="customer_id", textCol="review_body", n=10):
+    countColName="count_sents"
+    try: 
+        # set the window column and set it in desc order by sentence count
+        window = Window.partitionBy(topnCol).orderBy(F.desc(countColName))
+        # first - generater the sentence counts for each row
+        # second - use of rank over window and only taking the firts ranked item for each customer/product
+        # last - order by the sent count desc order and limit the final output to 10 rows only 
+        dfTop = dfRecords \
+            .withColumn(countColName, CountSents(textCol)) \
+            .withColumn("rank", F.rank().over(window)).where(col("rank") == 1) \
+            .orderBy(F.desc(countColName)) \
+            .limit(n)
+        return dfTop
+    except Exception: 
+        return None
+
 @F.udf(returnType=BooleanType())
 def FilterSentences(review_text): 
     '''
@@ -37,10 +54,10 @@ def FilterSentences(review_text):
         return True
     return False
 
-@F.udf(returnType=BooleanType())
+@F.udf(returnType=IntegerType())
 def CountSents(review_text): 
     '''
     count the number of sentences in each review
     '''
     # sent tokenize and return number of sents (count)
-    len(sent_tokenize(review_text))
+    return len(sent_tokenize(review_text))
