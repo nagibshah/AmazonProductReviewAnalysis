@@ -6,7 +6,7 @@ from pyspark.sql.window import Window
 from pyspark.sql.functions import count
 import pyspark.sql.functions as F
 from nltk.tokenize import sent_tokenize
-from pyspark.sql.types import StructType, StructField, StringType,IntegerType, FloatType,BooleanType,DateType
+from pyspark.sql.types import StructType, StructField, StringType,IntegerType, FloatType,BooleanType,DateType,ArrayType
 
 def median(values):
     try:
@@ -22,7 +22,8 @@ def distributionStats(dfRecords, partitionBy, countBy, returnCountName="total_re
             .withColumn(returnCountName, count(countBy) \
             .over(window)) \
             .drop(countBy).distinct() \
-            .orderBy(F.desc(returnCountName))
+            .orderBy(F.desc(returnCountName)) \
+            .limit(10)
         return dfMaxReviews
     except Exception:
         return None
@@ -53,6 +54,18 @@ def FilterSentences(review_text):
     if len(sent_tokenize(review_text)) > 2: 
         return True
     return False
+
+@F.udf(returnType=ArrayType(StringType(), False))
+def GenerateSentences(review_text): 
+    '''
+    utilise nltk tokenizer and generate individual sentences from text
+    generates a ArrayType 
+    '''
+    # sent tokenize
+    sentences = sent_tokenize(review_text)
+    #return np.asarray(sentences)
+    return sentences
+     
 
 @F.udf(returnType=IntegerType())
 def CountSents(review_text): 
