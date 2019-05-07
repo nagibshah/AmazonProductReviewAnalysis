@@ -5,6 +5,7 @@ from pyspark.sql.functions import col, count, countDistinct
 from pyspark.sql.window import Window
 from pyspark.sql.functions import count
 import pyspark.sql.functions as F
+from pyspark.sql import DataFrameStatFunctions as statFunc
 from nltk.tokenize import sent_tokenize
 from pyspark.sql.types import StructType, StructField, StringType,IntegerType, FloatType,BooleanType,DateType,ArrayType
 
@@ -22,10 +23,25 @@ def distributionStats(dfRecords, partitionBy, countBy, returnCountName="total_re
             .withColumn(returnCountName, count(countBy) \
             .over(window)) \
             .drop(countBy).distinct() \
-            .orderBy(F.desc(returnCountName)) \
-            .limit(10)
+            .orderBy(F.desc(returnCountName))
         return dfMaxReviews
     except Exception:
+        return None
+
+def getTopBySentMedian(dfRecords, partitionBy="customer_id", textCol="review_body",medianColName="medianSents", n=10):
+    countColName="count_sents"
+    try: 
+        # first - generate the sentence counts for each row
+        # second - group by the partition & aggregate over group using a median calc 
+        # last - order by the median sentences in desc orderand limit output to 10 rows 
+        median = F.expr('percentile_approx(count_sents, 0.5)') 
+        dfTop = dfRecords \
+            .withColumn(countColName, CountSents(textCol)) \
+            .groupBy(partitionBy).agg(median.alias(medianColName)) \
+            .orderBy(F.desc(medianColName)) \
+            .limit(n)
+        return dfTop
+    except Exception: 
         return None
 
 def getTopBySentNumber(dfRecords, topnCol="customer_id", textCol="review_body", n=10):
