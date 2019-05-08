@@ -1,5 +1,6 @@
 .DS_Store
 data/*
+output/*
 .vscode/*
 notebooks/.ipynb_checkpoints/*
 notebooks/__pycache__/*
