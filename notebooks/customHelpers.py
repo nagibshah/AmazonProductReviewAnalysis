@@ -8,6 +8,8 @@ import pyspark.sql.functions as F
 from pyspark.sql import DataFrameStatFunctions as statFunc
 from nltk.tokenize import sent_tokenize
 from pyspark.sql.types import StructType, StructField, StringType,IntegerType, FloatType,BooleanType,DateType,ArrayType
+from pyspark.ml.linalg import Vectors
+
 
 def median(values):
     try:
@@ -90,3 +92,14 @@ def CountSents(review_text):
     '''
     # sent tokenize and return number of sents (count)
     return len(sent_tokenize(review_text))
+
+def CosineDistance(vect_pair):    
+    
+    # Calculate the distance between two vectors givens its vectors in index ids.
+    # do not calculate the distance between a vectors and itself, assign 0 dist in that case.
+    if (vect_pair[0][1] != vect_pair[1][1]):
+        distance = 1 - (vect_pair[0][0].dot(vect_pair[1][0])/(vect_pair[0][0].norm(2)*vect_pair[1][0].norm(2)))
+    else:
+        distance = 0
+
+    return [distance, (vect_pair[0][1],vect_pair[1][1])]
