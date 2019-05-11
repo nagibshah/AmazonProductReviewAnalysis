@@ -102,4 +102,4 @@ def CosineDistance(vect_pair):
     else:
         distance = 0
 
-    return [distance, (vect_pair[0][1],vect_pair[1][1])]
+    return [vect_pair[0][1], vect_pair[1][1], float(distance)]
