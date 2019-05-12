@@ -1,6 +1,8 @@
 .DS_Store
 data/*
 output/*
+outputs/*
+embedders/*
 .vscode/*
 notebooks/.ipynb_checkpoints/*
 notebooks/__pycache__/*

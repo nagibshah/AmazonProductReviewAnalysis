@@ -8,8 +8,27 @@ import pyspark.sql.functions as F
 from pyspark.sql import DataFrameStatFunctions as statFunc
 from nltk.tokenize import sent_tokenize
 from pyspark.sql.types import StructType, StructField, StringType,IntegerType, FloatType,BooleanType,DateType,ArrayType
-from pyspark.ml.linalg import Vectors
+from pyspark.ml.linalg import Vectors, VectorUDT
+import tensorflow as tf
+import tensorflow_hub as hub
 
+# constants 
+AWS_PRODUCT_REVIEW_SCHEMA_LIMITED = StructType([
+    StructField("customer_id", StringType(), True),
+    StructField("review_id", StringType(), True),
+    StructField("product_id",StringType(),True),
+    StructField("product_title", StringType(), False),
+    StructField("product_category", StringType(), False),
+    StructField("star_rating", IntegerType(), False),
+    StructField("helpful_votes",IntegerType(),False),
+    StructField("total_votes", IntegerType(), False),
+    StructField("review_headline", StringType(), False),
+    StructField("review_body", StringType(), False),
+    StructField("review_date",DateType(),False)])
+
+VECTOR_SCHEMA = StructType([
+    StructField("review_id", StringType(), True),
+    StructField("vectors",VectorUDT(),True)])
 
 def median(values):
     try:
@@ -103,3 +122,30 @@ def CosineDistance(vect_pair):
         distance = 0
 
     return [distance, (vect_pair[0][1],vect_pair[1][1])]
+
+# negative embeddings
+def vectorizeSents(lines):
+    reviewids = list()
+    sentences = []
+    vectors=list()
+    module_url = "https://tfhub.dev/google/universal-sentence-encoder/2"
+    # module_url="../embedders"
+    embed = hub.Module(module_url)
+    
+    # unpack the lines 
+    for line in lines: 
+        items = list(line)
+        reviewids.append(items[0])
+        sentences.append(items[1])
+    
+    with tf.Session() as session:
+        session.run([tf.global_variables_initializer(), tf.tables_initializer()])
+        sent_embeddings = session.run(embed(sentences))
+    
+    # convert to vector before append to list
+    for embedding in sent_embeddings: 
+        vectors.append(Vectors.dense(embedding))
+    # build the return map rows
+    newlines = zip(reviewids, vectors)
+            
+    return (newlines)
