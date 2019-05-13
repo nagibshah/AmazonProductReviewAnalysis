@@ -149,3 +149,29 @@ def vectorizeSents(lines):
     newlines = zip(reviewids, vectors)
             
     return (newlines)
+
+def vectorizeSents2(lines):
+    reviewids = list()
+    sentences = []
+    vectors=list()
+    module_url = "https://tfhub.dev/google/universal-sentence-encoder/2"
+    # module_url="../embedders"
+    embed = hub.Module(module_url)
+    
+    # unpack the lines 
+    for line in lines: 
+        items = list(line)
+        reviewids.append(items[0])
+        sentences.append(items[1])
+    
+    with tf.Session() as session:
+        session.run([tf.global_variables_initializer(), tf.tables_initializer()])
+        sent_embeddings = session.run(embed(sentences))
+    
+    # convert to vector before append to list
+    #for embedding in sent_embeddings: 
+    #    vectors.append(Vectors.dense(embedding))
+    # build the return map rows
+    newlines = zip(reviewids, sent_embeddings)
+            
+    return (newlines)
